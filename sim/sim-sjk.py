@@ -23,7 +23,7 @@ CONFIG_LOG_DIR = "{}/config_records/"
 '''
 debug输出文件，在同级目录下
 '''
-logging.basicConfig(filename='out-sjk.log', level=logging.DEBUG)
+# logging.basicConfig(filename='out-sjk.log', level=logging.DEBUG)
 
 
 class Simulation:
@@ -286,7 +286,7 @@ class Simulation:
 if __name__ == "__main__":
 
     run_name = SINGLE_THREAD_SIM_NAME_FORMAT.format("sjk",
-                                                    datetime.datetime.now().strftime("%H:%M"))
+                                                    datetime.datetime.now().strftime("%H:%M:%S"))
     path_to_sim = os.path.relpath(pathlib.Path(__file__).resolve().parents[1], start=os.curdir)
 
     if os.path.isfile(sys.argv[1]):

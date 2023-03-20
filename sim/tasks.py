@@ -6,7 +6,6 @@ import random
 import logging
 from work_search_state import WorkSearchState
 
-logging.basicConfig(filename='out.log', level=logging.DEBUG)
 
 
 class Task:
@@ -42,6 +41,7 @@ class Task:
         self.config = config
         self.state = state
         self.preempted_sjk = False
+        self.sjk_time = 0
 
     def expected_completion_time(self):
         """Return predicted completion time based on time left."""
@@ -58,7 +58,7 @@ class Task:
         self.time_left -= time_increment
 
         # Any processing that must be done with the decremented timer but before the time left is checked
-        # self.process_logic(False)
+        # self.process_logic()
         self.process_logic(sjk=True)
 
         # If no more time left and stop condition is met, complete the task
@@ -72,11 +72,12 @@ class Task:
         """
         检查新宿系统模拟中，是否需要抢占,将对应的标志设置为True
         """
-        if sjk:
-            check_whether_to_preempt = self.service_time - self.time_left
+        if sjk and not isinstance(self, WorkSearchSpin):
+            check_whether_to_preempt = self.service_time - self.time_left - self.sjk_time
             preempt_flag = check_whether_to_preempt > 500
             if preempt_flag and self.time_left > 0:
                 self.preempted_sjk = True
+                self.sjk_time = self.sjk_time + 500
         pass
 
     def on_complete(self):
@@ -119,6 +120,9 @@ class Task:
         if config.delay_flagging_enabled:
             headers += ["Flag Steal Count", "Flag Wait Time", "Flag Set Delay", "Flagged", "Flagged Time Left"]
         return headers
+
+    def set_sjk(self, sjk=False):
+        self.preempted_sjk = sjk
 
     def __str__(self):
         if not self.complete:

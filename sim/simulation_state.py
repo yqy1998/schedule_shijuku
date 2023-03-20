@@ -328,24 +328,14 @@ class SimulationState:
         else:
             random.seed(config.name)
 
-        # Set reallocation schedule if replaying one
-        if config.reallocation_replay:
-            record_file = open("./results/sim_{}/realloc_schedule".format(config.reallocation_record), "r")
-            self.reallocation_schedule = eval(record_file.read())
-            self.reallocations = len(self.reallocation_schedule)
-            record_file.close()
-
         # Initialize queues
         for i in range(len(set(config.mapping))):
             self.queues.append(Queue(i, config, self))
         self.available_queues = list(set(config.mapping))
 
-        if config.join_bounded_shortest_queue:
-            self.main_queue = Queue(-1, config, self)
-
         # Initialize threads
         for i in range(config.num_threads):
-            queue = self.queues[config.mapping[i]]
+            queue = self.queues[0]
             self.threads.append(Thread(queue, i, config, self))
             queue.set_thread(i)
 

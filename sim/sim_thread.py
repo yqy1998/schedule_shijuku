@@ -7,9 +7,6 @@ from work_search_state import WorkSearchState
 from tasks import WorkSearchSpin, WorkStealTask, Task, EnqueuePenaltyTask, RequeueTask, ReallocationTask, FlagStealTask, QueueCheckTask, OracleWorkStealTask, IdleTask
 
 
-logging.basicConfig(filename='out.log', level=logging.DEBUG)
-
-
 class Thread:
     """Thread assigned to application to complete tasks."""
 
@@ -238,10 +235,19 @@ class Thread:
         # print("当前时间剩余：", self.current_task.time_left)
         flag = self.current_task is None
         if not flag and self.current_task.preempted_sjk:
-            self.current_task.preempted_sjk = False
+            self.current_task.set_sjk()
             self.queue.enqueue(self.current_task)
             logging.debug("[SJK]:{} requeue to queue 0".format(self.current_task))
-            # self.schedule(Requeue=True)
+            if self.current_task.is_productive:
+                self.last_complete = self.state.timer.get_time()
+
+            self.previous_task_type = type(initial_task)
+
+            self.current_task = None
+
+            # Park if deallocation is scheduled
+            if self.scheduled_dealloc:
+                self.work_search_state.park()
 
         # If the task was preempted, schedule again
         if initial_task.preempted:
