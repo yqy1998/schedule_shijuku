@@ -1,14 +1,15 @@
 #!/bin/zsh
+set -o errexit
 
 cd sim
 echo "切换到目录sim... $(pwd)"
-time_format=$(date +"%H:%M:%S")
-echo "当前时间： $time_format"
+
 echo "移除log文件..."
 if [ -f out.log ]; then
   rm out.log
 fi
-
+time_format=$(date +"%d-%H:%M:%S")
+echo "当前时间： $time_format"
 start_time=$(date +%s)
 echo "模拟开始"
 python3 sim-sjk.py ../configs/config.json

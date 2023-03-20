@@ -53,13 +53,14 @@ class Simulation:
         while self.state.any_incomplete() and \
                 (self.config.sim_duration is None or self.state.timer.get_time() < self.config.sim_duration):
 
-            next_arrival, next_alloc = self.find_next_arrival_and_alloc(task_number, allocation_number)
-            time_jump, reschedule_required = self.find_time_jump(next_arrival, next_alloc,
-                                                                 immediate_reschedule=reschedule_required)
-            '''
-            debug：记录步过的时间片
-            '''
-            logging.debug("\n(jump: {}, rr: {})".format(time_jump, reschedule_required))
+            if self.config.fast_forward_enabled:
+                next_arrival, next_alloc = self.find_next_arrival_and_alloc(task_number, allocation_number)
+                time_jump, reschedule_required = self.find_time_jump(next_arrival, next_alloc,
+                                                                     immediate_reschedule=reschedule_required)
+                '''
+                debug：记录步过的时间片
+                '''
+                logging.debug("\n(jump: {}, rr: {})".format(time_jump, reschedule_required))
 
             '''
             将所有的请求放入队列中
@@ -286,7 +287,7 @@ class Simulation:
 if __name__ == "__main__":
 
     run_name = SINGLE_THREAD_SIM_NAME_FORMAT.format("sjk",
-                                                    datetime.datetime.now().strftime("%H:%M:%S"))
+                                                    datetime.datetime.now().strftime("%d-%H:%M:%S"))
     path_to_sim = os.path.relpath(pathlib.Path(__file__).resolve().parents[1], start=os.curdir)
 
     if os.path.isfile(sys.argv[1]):
