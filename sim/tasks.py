@@ -74,10 +74,10 @@ class Task:
         """
         if sjk and not isinstance(self, WorkSearchSpin) and len(self.state.queues[0].queue) > 0:
             check_whether_to_preempt = self.service_time - self.time_left - self.sjk_time
-            preempt_flag = check_whether_to_preempt > 500
+            preempt_flag = check_whether_to_preempt > 406
             if preempt_flag and self.time_left > 0:
                 self.preempted_sjk = True
-                self.sjk_time = self.sjk_time + 500
+                self.sjk_time = self.sjk_time + 406
         pass
 
     def on_complete(self):

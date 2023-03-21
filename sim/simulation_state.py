@@ -354,23 +354,36 @@ class SimulationState:
         if config.bimodal_service_time:
             distribution = [500] * 9 + [5500]
         i = 0
-        while (config.sim_duration is None or next_task_time < config.sim_duration) and \
-                (config.num_tasks is None or i < config.num_tasks):
-            service_time = None
-            while service_time is None or service_time == 0:
-                if config.constant_service_time:
-                    service_time = config.AVERAGE_SERVICE_TIME
-                elif config.bimodal_service_time:
-                    service_time = random.choice(distribution)
-                else:
-                    service_time = int(random.expovariate(1 / config.AVERAGE_SERVICE_TIME))
+        with open("bimodal-10000000ns.txt", "r") as file:
+            content = file.readlines()
+        task_list = []
+        for line in content:
+            sublist = eval(line.strip())
+            task_list.append(sublist)
 
-            self.tasks.append(Task(service_time, next_task_time, config, self))
-            if config.regular_arrivals:
-                next_task_time += int(1 / request_rate)
-            else:
-                next_task_time += int(random.expovariate(request_rate))
-
-            if config.progress_bar and i % 100 == 0:
-                progress.print_progress(next_task_time, config.sim_duration, decimals=3, length=50)
+        length = len(task_list)
+        while i < length:
+            self.tasks.append(Task(task_list[i][0], task_list[i][1], config, self))
+            if config.progress_bar and i % length == 0:
+                progress.print_progress(i, length, decimals=3, length=50)
             i += 1
+        # while (config.sim_duration is None or next_task_time < config.sim_duration) and \
+        #         (config.num_tasks is None or i < config.num_tasks):
+        #     service_time = None
+        #     while service_time is None or service_time == 0:
+        #         if config.constant_service_time:
+        #             service_time = config.AVERAGE_SERVICE_TIME
+        #         elif config.bimodal_service_time:
+        #             service_time = random.choice(distribution)
+        #         else:
+        #             service_time = int(random.expovariate(1 / config.AVERAGE_SERVICE_TIME))
+        #
+        #     self.tasks.append(Task(service_time, next_task_time, config, self))
+        #     if config.regular_arrivals:
+        #         next_task_time += int(1 / request_rate)
+        #     else:
+        #         next_task_time += int(random.expovariate(request_rate))
+        #
+        #     if config.progress_bar and i % 100 == 0:
+        #         progress.print_progress(next_task_time, config.sim_duration, decimals=3, length=50)
+        #     i += 1
