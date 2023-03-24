@@ -287,7 +287,7 @@ class Simulation:
 if __name__ == "__main__":
 
     run_name = SINGLE_THREAD_SIM_NAME_FORMAT.format("sjk",
-                                                    datetime.datetime.now().strftime("%d-%H:%M:%S"))
+                                                    datetime.datetime.now().strftime("%d_%H-%M-%S"))
     path_to_sim = os.path.relpath(pathlib.Path(__file__).resolve().parents[1], start=os.curdir)
 
     if os.path.isfile(sys.argv[1]):

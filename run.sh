@@ -8,8 +8,8 @@ echo "移除log文件..."
 if [ -f out.log ]; then
   rm out.log
 fi
-time_format=$(date +"%d-%H:%M:%S")
-echo "当前时间： $time_format"
+time_format=$(date +"%d_%H-%M-%S")
+echo "当前时间： $(date +"%H:%M:%S")"
 start_time=$(date +%s)
 echo "模拟开始"
 python3 sim-sjk.py ../configs/config.json

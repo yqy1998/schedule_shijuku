@@ -355,6 +355,7 @@ class SimulationState:
             distribution = [500] * 9 + [5500]
         i = 0
         with open("bimodal-10000000ns.txt", "r") as file:
+        # with open("Exponential-10000000ns.txt", "r") as file:
             content = file.readlines()
         task_list = []
         for line in content:
