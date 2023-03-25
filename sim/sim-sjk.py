@@ -23,7 +23,7 @@ CONFIG_LOG_DIR = "{}/config_records/"
 '''
 debug输出文件，在同级目录下
 '''
-# logging.basicConfig(filename='out-sjk.log', level=logging.DEBUG)
+logging.basicConfig(filename='out-sjk.log', level=logging.DEBUG)
 
 
 class Simulation:
