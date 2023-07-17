@@ -19,6 +19,7 @@ if os.path.isfile(sys.argv[1]):
     sim_cores = cfg.num_threads
     sim_loads = cfg.avg_system_load
     sim_time = cfg.sim_duration
+    distribution = cfg.bimodal_service_time
     cfg_json.close()
     file_path = "analyses/" + sys.argv[2] + ".csv"
     dir_name = sys.argv[2]
@@ -27,9 +28,13 @@ if os.path.isfile(sys.argv[1]):
         ninety_nine = df.iloc[0]["99% Tail Latency"]
         ninety_nine_nine = df.iloc[0]["99.9% Tail Latency"]
         sim_throughput = df.iloc[0]["Throughput"]
-        columns = ["运行名称", "核心数", "负载", "模拟时间", "99%尾延迟", "99.9#尾延迟", "吞吐量"]
+        if distribution:
+            dtb = "双峰"
+        else:
+            dtb = "指数"
+        columns = ["运行名称", "核心数", "负载", "模拟时间", "99%尾延迟", "99.9%尾延迟", "吞吐量", "丢弃时间百分比", "分布"]
         data = [str(sys.argv[2]), str(sim_cores), str(sim_loads), str(sim_time), str(ninety_nine), str(ninety_nine_nine)
-                , str(sim_throughput)]
+                , str(sim_throughput), str(sys.argv[3]), dtb]
         if not os.path.isfile('multi_sim_data.csv'):
             with open('multi_sim_data.csv', mode='w') as file:
                 writer = csv.writer(file)
@@ -42,6 +47,8 @@ if os.path.isfile(sys.argv[1]):
         raise FileNotFoundError(file_path)
 else:
     raise FileNotFoundError(sys.argv[1])
+
+
 
 
 

@@ -22,7 +22,7 @@ RESULTS_DIR = "{}/results/"
 META_LOG_FILE = "{}/results/meta_log"
 CONFIG_LOG_DIR = "{}/config_records/"
 
-logging.basicConfig(filename='outIX.log', level=logging.DEBUG)
+# logging.basicConfig(filename='outIX.log', level=logging.DEBUG)
 
 
 class Simulation:
@@ -137,9 +137,8 @@ class Simulation:
                 # Schedule threads
                 for thread in self.state.threads:
                     thread.schedule()
-
-                # Move forward in time
                 self.state.timer.increment(1)
+
 
             # Log state (in debug mode)
             logging.debug("\nTime step: {}".format(self.state.timer))

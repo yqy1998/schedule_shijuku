@@ -4,7 +4,7 @@
 import random
 import logging
 from work_search_state import WorkSearchState
-from tasks import WorkSearchSpin, WorkStealTask, Task, EnqueuePenaltyTask, RequeueTask, ReallocationTask, FlagStealTask, QueueCheckTask, OracleWorkStealTask, IdleTask
+from tasks import WorkSearchSpin, WorkStealTask, Task, EnqueuePenaltyTask, RequeueTask, ReallocationTask, FlagStealTask, QueueCheckTask, OracleWorkStealTask, IdleTask, SjkTask
 
 
 class Thread:
@@ -63,6 +63,7 @@ class Thread:
 
         self.config = config
         self.state = state
+        self.sjk_task = False
 
     def total_time(self):
         """Return total time spent on tasks, distracted, unpaired, and paired."""
@@ -237,7 +238,7 @@ class Thread:
         if not flag and self.current_task.preempted_sjk:
             self.current_task.set_sjk()
             self.queue.enqueue(self.current_task)
-            logging.debug("[SJK]:{} requeue to queue 0".format(self.current_task))
+            # logging.debug("[SJK]:{} requeue to queue 0".format(self.current_task))
             if self.current_task.is_productive:
                 self.last_complete = self.state.timer.get_time()
 
@@ -245,9 +246,11 @@ class Thread:
 
             self.current_task = None
 
-            # Park if deallocation is scheduled
             if self.scheduled_dealloc:
                 self.work_search_state.park()
+            self.state.sjk = True
+            self.sjk_task = True
+            # self.state.timer.increment(5)
 
         # If the task was preempted, schedule again
         if initial_task.preempted:
@@ -260,7 +263,10 @@ class Thread:
         if Requeue:
             self.work_search_state = WorkSearchState.LOCAL_QUEUE_FIRST_CHECK
         # Work on current task if there is one
-        if self.is_busy():
+        if self.sjk_task:
+            self.current_task = SjkTask(200, self.config, self.state)
+            self.sjk_task = False
+        elif self.is_busy():
             # Only non-new tasks should use the time_increment (new ones did not exist before this cycle)
             self.process_task(time_increment=time_increment)
 

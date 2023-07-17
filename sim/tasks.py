@@ -74,10 +74,15 @@ class Task:
         """
         if sjk and not isinstance(self, WorkSearchSpin) and len(self.state.queues[0].queue) > 0:
             check_whether_to_preempt = self.service_time - self.time_left - self.sjk_time
-            preempt_flag = check_whether_to_preempt > 406
+            preempt_flag = check_whether_to_preempt > 5001
+            if self.state.timer.get_time() - self.arrival_time > 25000:
+                preempt_flag = False
             if preempt_flag and self.time_left > 0:
                 self.preempted_sjk = True
-                self.sjk_time = self.sjk_time + 406
+                self.sjk_time = self.sjk_time + 5001
+            # if self.state.timer.get_time() % 2000 == 0:
+            #     print(self.state.timer.get_time())
+            #     self.preempted_sjk = True
         pass
 
     def on_complete(self):
@@ -310,6 +315,20 @@ class IdleTask(Task):
         return "Idle Queue Task (arrival {}, duration {})".format(
             self.arrival_time, self.service_time)
 
+
+class SjkTask(Task):
+    def __init__(self, time, config, state):
+        super().__init__(time, state.timer.get_time(), config, state)
+
+    def process(self, time_increment=1, stop_condition=None):
+        super().process(time_increment, stop_condition)
+
+    def on_complete(self):
+        pass
+
+    def descriptor(self):
+        return "Sjk Task (arrival {}, duration {})".format(
+            self.arrival_time, self.service_time)
 
 class EnqueuePenaltyTask(Task):
     """Task to spin through an enqueue penalty."""
